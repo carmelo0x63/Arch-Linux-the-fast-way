@@ -51,7 +51,8 @@ Once the VM creation process will start, open the Console and, in a few seconds,
 Only two things are left to be done while on Console:
 1. set the root password with `passwd`
 2. find the VM's IP address
-The next steps will be carried out through SSH from a separate host.<br/>
+
+The next steps will be carried out while connected with SSH from a separate host.<br/>
 
 #### Second phase: connect via SSH and boot Arch Linux
 3. connect via SSH to the IP address shown above, do not save the IP address among the local known SSH keys
