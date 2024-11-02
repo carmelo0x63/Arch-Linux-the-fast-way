@@ -17,7 +17,7 @@ Setup:
 
 **NOTE**: the steps won't be very different with other hypervisors or, even, a bare metal host.<br/>
 
-The installation takes place in two separate phases:
+The installation takes place in two separate phases:<br/>
 a. the VM is deployed by means of the hypervisor (Proxmox console)<br/>
 b. the rest of the installation happens through SSH<br/>
 Although in a concise way, I'll document the steps and what they achieve.<br/>
