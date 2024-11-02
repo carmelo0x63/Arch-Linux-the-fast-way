@@ -78,6 +78,7 @@ root@archiso ~ # timedatectl set-timezone <Region>/<City>
 <br/>
 
 6. partition the disk
+
 **NOTE**: this is a somewhat complex step requiring deeper knowledge of disks, filesystems, etc. If you know what you're doing, here's my, again, super essential, partition scheme:<br/>
 
 | Device | Boot | Start | End | Sectors | Size | Id  | Type |
@@ -88,7 +89,7 @@ root@archiso ~ # timedatectl set-timezone <Region>/<City>
 
 <br/>
 
-7. create EXT4 and Swap partitions
+7. create [Ext4](https://wiki.archlinux.org/title/Ext4) and [Swap](https://wiki.archlinux.org/title/Swap) partitions
 ```
 root@archiso ~ # mkfs.ext4 /dev/sda1
 
@@ -122,18 +123,20 @@ root@archiso ~ # pacstrap /mnt base base-devel linux linux-firmware
 
 <br/>
 
-10. generate `fstab`
+10. generate [fstab](https://wiki.archlinux.org/title/Fstab)
 ```
 root@archiso ~ # genfstab -U /mnt >> /mnt/etc/fstab
 ```
 
 <br/>
 
-11. [Chroot](https://wiki.archlinux.org/title/Chroot) into new system
+11. [Chroot](https://wiki.archlinux.org/title/Chroot) into the new system
 ```
 root@archiso ~ # arch-chroot /mnt
 ```
+
 **NOTE**: notice how the prompt changes after the last command, we're now in a different `root` directory with its own settings.
+
 - Before arch-chroot:
 ```
 / (installation media root)
@@ -186,6 +189,7 @@ root@archiso ~ # arch-chroot /mnt
 
 [root@archiso /]# systemctl enable NetworkManager
 ```
+
 **NOTE**: this is extremely important otherwise no networking will be available after reboot
 
 <br/>
@@ -205,6 +209,7 @@ root@archiso ~ # arch-chroot /mnt
 
 [root@archiso /]# grub-mkconfig -o /boot/grub/grub.cfg
 ```
+
 **NOTE**: the settings above depend on the `BIOS` vs. `EFI` choice made before. YMMV!
 
 <br/>
