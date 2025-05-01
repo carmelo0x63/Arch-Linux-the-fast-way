@@ -6,4 +6,22 @@ Head back to the console and connect to the VM. On my systems, it takes only a f
 
 <img src="assets/images/reboot.png">
 
-Let's login as `root`, the password has been setup in the [previous section](first.md) during step #16.<br/>
+Let's login as `root`, the password has been setup in the [previous section](first.md) during step #17.<br/>
+
+```
+# useradd -m -G wheel <user>
+
+# passwd <user>
+```
+
+The next step is to install OpenSSH to be able to reach the server remotely, as such:
+```
+# pacman -S openssh
+
+# systemctl enable --now sshd
+
+# sed -i "s/#PermitRootLogin prohibit-password/PermitRootLogin yes/" /etc/ssh/sshd_config
+
+# systemctl restart sshd
+```
+**NOTE**: by default `root` is prohibited from connecting to the host, we need

@@ -1,14 +1,14 @@
 ### First steps
 
 Setup:
-- virtualization infra: Proxmox v. 8.2
-- ISO file: archlinux-2024.11.01-x86_64.iso
+- virtualization infra: Proxmox v. 8.4.1
+- ISO file: archlinux-2025.04.01-x86_64.iso
 
 **NOTE**: the steps won't be very different with other hypervisors or, even, a bare metal host.<br/>
 
 The installation takes place in two separate phases:<br/>
-a. the VM is deployed by means of the hypervisor (Proxmox console)<br/>
-b. the rest of the installation happens through SSH<br/>
+1. the VM is deployed by means of the hypervisor (Proxmox console)<br/>
+2. the rest of the installation happens through SSH<br/>
 Although in a concise way, I'll document the steps and what they achieve.<br/>
 
 #### First phase: minimal VM creation and essential setup
@@ -34,19 +34,22 @@ As a starting point a VM must be created in Proxmox VE with the following charac
 - Network: leave untouched
 <img src="assets/images/vminstall07.png">
 
-Once the VM creation process will start, open the Console and, in a few seconds, you'll be greeted by the Linux prompt.
+Once the VM creation process will start...
+<img src="assets/images/first_boot.png">
+
+... access the Console and, in a few seconds, you'll be greeted by the Linux prompt.
 <img src="assets/images/first_prompt.png">
 
-Only two things are left to be done while on Console:
-1. set the root password with `passwd`
-2. find the VM's IP address
+Only two things are left to be done **while on Console**:
+1. set the root password: `# passwd`
+2. find the VM's IP address: `# ip a`
 
-The next steps will be carried out while connected with SSH from a separate host.<br/>
+Then, the next steps will be carried out **while connected with SSH** from a separate host.<br/>
 
 #### Second phase: connect via SSH and boot Arch Linux
-3. connect via SSH to the IP address shown above, do not save the IP address among the local known SSH keys
+3. connect via SSH to the IP address shown above (e.g. 192.0.2.113), it is preferrable not to save the IP address among the local known SSH keys
 ```
-% ssh -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null root@192.0.2.109
+% ssh -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null root@<ip_address>
 ```
 
 <br/>
@@ -66,7 +69,16 @@ root@archiso ~ # timedatectl set-timezone <Region>/<City>
 
 <br/>
 
-6. partition the disk
+6. identify your disk
+```
+root@archiso ~ # lsblk
+NAME  MAJ:MIN RM   SIZE RO TYPE MOUNTPOINTS
+loop0   7:0    0 841.4M  1 loop /run/archiso/airootfs
+sda     8:0    0    16G  0 disk
+sr0    11:0    1   1.2G  0 rom  /run/archiso/bootmnt
+```
+
+7. partition the disk
 
 **NOTE**: this is a somewhat complex step requiring deeper knowledge of disks, filesystems, etc. If you know what you're doing, here's my, again, super essential, partition scheme:<br/>
 
@@ -78,7 +90,7 @@ root@archiso ~ # timedatectl set-timezone <Region>/<City>
 
 <br/>
 
-7. create [Ext4](https://wiki.archlinux.org/title/Ext4) and [Swap](https://wiki.archlinux.org/title/Swap) partitions
+8. create [Ext4](https://wiki.archlinux.org/title/Ext4) and [Swap](https://wiki.archlinux.org/title/Swap) partitions
 ```
 root@archiso ~ # mkfs.ext4 /dev/sda1
 
@@ -91,7 +103,7 @@ root@archiso ~ # swapon /dev/sda3
 
 <br/>
 
-8. mount `sda1` (`/boot`) and `sda2` (`/`) to temporary directories
+9. mount `sda1` (`/boot`) and `sda2` (`/`) to temporary directories
 ```
 root@archiso ~ # mount /dev/sda2 /mnt
 
@@ -100,7 +112,7 @@ root@archiso ~ # mount --mkdir /dev/sda1 /mnt/boot
 
 <br/>
 
-9. install into `/mnt` essential packages with `pacstrap` ("PAckage bootsSTRAP")
+10. install into `/mnt` essential packages with `pacstrap` ("PAckage bootsSTRAP")
 ```
 root@archiso ~ # pacstrap /mnt base base-devel linux linux-firmware
 ```
@@ -112,14 +124,14 @@ root@archiso ~ # pacstrap /mnt base base-devel linux linux-firmware
 
 <br/>
 
-10. generate [fstab](https://wiki.archlinux.org/title/Fstab)
+11. generate [fstab](https://wiki.archlinux.org/title/Fstab)
 ```
 root@archiso ~ # genfstab -U /mnt >> /mnt/etc/fstab
 ```
 
 <br/>
 
-11. [Chroot](https://wiki.archlinux.org/title/Chroot) into the new system
+12. [Chroot](https://wiki.archlinux.org/title/Chroot) into the new system
 ```
 root@archiso ~ # arch-chroot /mnt
 ```
@@ -147,32 +159,32 @@ root@archiso ~ # arch-chroot /mnt
 
 <br/>
 
-12. set timezone by creating a soft link, synchronize the VM's _hardware_ clock to the system's clock
+13. set timezone by creating a soft link, synchronize the VM's _hardware_ clock to the system's clock
 ```
-[root@archiso /]# ln -sf /usr/share/zoneinfo/Europe/Rome /etc/localtime
+[root@archiso /]# ln -sf /usr/share/zoneinfo/<Region>/<City> /etc/localtime
 
 [root@archiso /]# hwclock --systohc
 ```
 
 <br/>
 
-13. set the appropriate [locale](https://wiki.archlinux.org/title/Locale), for instance:
+14. set the appropriate [locale](https://wiki.archlinux.org/title/Locale), for instance:
 ```
-[root@archiso /]# sed -i "s/#en_US.UTF-8 UTF-8/en_US.UTF-8 UTF-8/" /etc/locale.gen
+[root@archiso /]# sed -i "s/#\(en_US.UTF-8 UTF-8\)/\1/" /etc/locale.gen
 
 [root@archiso /]# locale-gen
 ```
 
 <br/>
 
-14. set a hostname
+15. set a hostname
 ```
-[root@archiso /]# echo "archlinux-nuc" > /etc/hostname
+[root@archiso /]# echo "<hostname>" > /etc/hostname
 ```
 
 <br/>
 
-15. install package `networkmanager`
+16. install package `networkmanager`
 ```
 [root@archiso /]# pacman -S networkmanager
 
@@ -183,14 +195,14 @@ root@archiso ~ # arch-chroot /mnt
 
 <br/>
 
-16. set password for user `root`
+17. set (again) password for user `root`
 ```
 [root@archiso /]# passwd
 ```
 
 <br/>
 
-17. install a [bootloader](https://wiki.archlinux.org/title/Boot_loader) of your choice, e.g. `grub`
+18. install a [bootloader](https://wiki.archlinux.org/title/Boot_loader) of your choice, e.g. `grub`
 ```
 [root@archiso /]# pacman -S grub
 
@@ -203,7 +215,7 @@ root@archiso ~ # arch-chroot /mnt
 
 <br/>
 
-18. leave the _chrooted_ environment, unmount the disk, **reboot**
+19. leave the _chrooted_ environment, unmount the disk, **reboot**
 ```
 [root@archiso /]# exit
 
