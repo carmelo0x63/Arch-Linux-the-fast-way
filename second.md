@@ -24,4 +24,4 @@ The next step is to install OpenSSH to be able to reach the server remotely, as 
 
 # systemctl restart sshd
 ```
-**NOTE**: by default `root` is prohibited from connecting to the host, we need
+**NOTE**: by default `root` is prohibited from connecting to the host, we need connect as `<user>`.

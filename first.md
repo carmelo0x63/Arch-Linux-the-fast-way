@@ -226,7 +226,4 @@ root@archiso ~ # reboot
 
 If the steps above have been followed properly, and no error messages have been returned, you should now have a minimal but working Arch Linux VM!<br/>
 
-With this VM as your lab, don't stop! Keep experimenting and breaking/fixing things.<br/>
-
-As for me, knowing that I can always _blindly_ spin a new VM gives me confidence to experiment even more.<br/>
-
+Head back to Proxmox console then follow the [additional configuration](second.md) steps.
